@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Icon Generator</title>
+<style>body{font-family:sans-serif;padding:24px;background:#111;color:#eee}canvas{border:1px solid #333;margin:8px}button{padding:10px 20px;background:#16a34a;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;margin:4px}</style>
+</head>
+<body>
+<h2>SisiPay Icon Generator</h2>
+<p>Click to generate and download icon PNGs needed for the PWA.</p>
+<div><canvas id="c192" width="192" height="192"></canvas><canvas id="c512" width="512" height="512"></canvas></div>
+<button onclick="gen(192)">Download icon-192.png</button>
+<button onclick="gen(512)">Download icon-512.png</button>
+<script>
+function drawIcon(size) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const s = size / 512;
+
+  // Background
+  ctx.fillStyle = '#0c1220';
+  roundRect(ctx, 0, 0, size, size, 96*s);
+  ctx.fill();
+
+  // Sun circle
+  ctx.fillStyle = '#16a34a';
+  ctx.beginPath();
+  ctx.arc(256*s, 200*s, 52*s, 0, Math.PI*2);
+  ctx.fill();
+
+  // Sun rays
+  ctx.strokeStyle = '#22c55e';
+  ctx.lineWidth = 14*s;
+  ctx.lineCap = 'round';
+  const rays = [[256,108,256,88],[256,292,256,312],[164,200,144,200],[348,200,368,200],[191,135,177,121],[321,265,335,279],[191,265,177,279],[321,135,335,121]];
+  rays.forEach(([x1,y1,x2,y2]) => {
+    ctx.beginPath();ctx.moveTo(x1*s,y1*s);ctx.lineTo(x2*s,y2*s);ctx.stroke();
+  });
+
+  // Lightning bolt
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.moveTo(264*s,182*s);ctx.lineTo(248*s,204*s);ctx.lineTo(260*s,204*s);ctx.lineTo(248*s,226*s);ctx.lineTo(272*s,200*s);ctx.lineTo(258*s,200*s);ctx.closePath();
+  ctx.fill();
+
+  // Naira sign
+  ctx.fillStyle = '#22c55e';
+  ctx.font = `900 ${120*s}px 'Segoe UI',sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('₦', 256*s, 410*s);
+
+  return canvas;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
+}
+
+function gen(size) {
+  const canvas = drawIcon(size);
+  // Preview
+  const preview = document.getElementById('c'+size);
+  const pctx = preview.getContext('2d');
+  pctx.drawImage(canvas, 0, 0, size, size);
+  // Download
+  canvas.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `icon-${size}.png`;
+    a.click();
+  });
+}
+
+// Auto preview
+[192,512].forEach(s=>{
+  const canvas = drawIcon(s);
+  const preview = document.getElementById('c'+s);
+  const pctx = preview.getContext('2d');
+  pctx.drawImage(canvas, 0, 0, s, s);
+});
+</script>
+</body>
+</html>

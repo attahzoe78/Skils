@@ -1,0 +1,21 @@
+{
+  "name": "SisiPay Business Suite",
+  "short_name": "SisiPay",
+  "description": "Jos Solar PAYGO, E-Keke Fleet & POS Business Management Platform",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0c1220",
+  "theme_color": "#16a34a",
+  "lang": "en",
+  "categories": ["business", "finance", "productivity"],
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Solar Customers", "short_name": "Solar", "url": "./#solar", "icons": [{ "src": "icon.svg", "sizes": "any" }] },
+    { "name": "Keke Fleet", "short_name": "Keke", "url": "./#keke", "icons": [{ "src": "icon.svg", "sizes": "any" }] },
+    { "name": "POS Agents", "short_name": "POS", "url": "./#pos", "icons": [{ "src": "icon.svg", "sizes": "any" }] }
+  ]
+}

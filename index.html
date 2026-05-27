@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#16a34a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SisiPay">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>SisiPay — Business Suite</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c1220;--sf:#17223b;--s2:#1e2d45;--s3:#263552;--border:#2d3f5a;
+  --text:#eef2ff;--muted:#8096b5;
+  --green:#22c55e;--gd:#16a34a;--gd2:#166534;
+  --yellow:#fbbf24;--yd:#b45309;
+  --red:#f87171;--rd:#b91c1c;
+  --orange:#fb923c;--od:#c2410c;
+  --purple:#c084fc;--pd:#7e22ce;
+  --blue:#60a5fa;--bd:#1d4ed8;
+  --cyan:#22d3ee;
+}
+html,body{height:100%;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--sf);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0);box-shadow:0 -4px 20px rgba(0,0,0,.4)}
+.nb{flex:1;padding:10px 2px 8px;background:none;border:none;color:var(--muted);font-size:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .15s;font-family:inherit}
+.nb.on{color:var(--green)}
+.nb svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.scr{display:none;min-height:100svh;padding-bottom:74px}
+.scr.on{display:block}
+.ph{position:sticky;top:0;z-index:50;background:var(--bg);padding:14px 16px 12px;border-bottom:1px solid var(--border);backdrop-filter:blur(12px)}
+.ph-title{font-size:20px;font-weight:800;letter-spacing:-.4px}
+.ph-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.card{background:var(--sf);border-radius:14px;padding:14px;margin:10px 14px;border:1px solid var(--border)}
+.clbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:10px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:10px 14px}
+.stats.s3{grid-template-columns:repeat(3,1fr)}
+.stats.s4{grid-template-columns:repeat(4,1fr)}
+.sv{background:var(--sf);border:1px solid var(--border);border-radius:12px;padding:12px 10px}
+.sv-v{font-size:18px;font-weight:800;line-height:1.1}
+.sv-l{font-size:10px;color:var(--muted);margin-top:3px}
+.fp{padding:0 14px}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 13px;background:var(--s2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;transition:border-color .15s;-webkit-appearance:none;font-family:inherit}
+.fg input:focus,.fg select:focus{border-color:var(--green)}
+.fg input[readonly]{color:var(--muted);cursor:default}
+.fg select option{background:var(--sf)}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pfx-w{position:relative}
+.pfx-w .pfx{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
+.pfx-w input{padding-left:26px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 18px;border-radius:10px;border:none;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s;white-space:nowrap;font-family:inherit;line-height:1}
+.btn:active{opacity:.7;transform:scale(.97)}
+.btn-pr{background:var(--gd);color:#fff}
+.btn-gr{background:var(--green);color:#000}
+.btn-ye{background:var(--yellow);color:#000}
+.btn-re{background:var(--red);color:#fff}
+.btn-gh{background:var(--s2);color:var(--text)}
+.btn-pu{background:var(--pd);color:#fff}
+.btn-or{background:var(--od);color:#fff}
+.btn-bl{background:var(--bd);color:#fff}
+.btn-w{width:100%}
+.btn-sm{padding:7px 12px;font-size:12px;border-radius:8px}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.ba{background:#14532d;color:#4ade80}
+.bo{background:#78350f;color:#fde68a}
+.bl{background:#450a0a;color:#fca5a5}
+.bav{background:#1e3a5f;color:#93c5fd}
+.bin{background:#3b0764;color:#e9d5ff}
+.bw{display:flex;align-items:center;gap:8px}
+.bt{flex:1;height:7px;background:var(--s2);border-radius:4px;overflow:hidden}
+.bf{height:100%;border-radius:4px;transition:width .5s}
+.bhi{background:var(--green)}
+.bmd{background:var(--yellow)}
+.blo{background:var(--red)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:8px 10px;text-align:left;color:var(--muted);font-size:11px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:700}
+td{padding:10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+tr:last-child td{border:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.al{border-radius:12px;padding:12px 14px;margin:10px 14px;display:flex;align-items:flex-start;gap:10px}
+.al-w{background:#431407;border:1px solid #92400e}
+.al-r{background:#3f0012;border:1px solid #9f1239}
+.al-b{background:#0c1d3b;border:1px solid #1d4ed8}
+.al-g{background:#052e16;border:1px solid #166534}
+.al-ico{font-size:22px;flex-shrink:0;line-height:1.2}
+.al-body{flex:1;min-width:0}
+.al-title{font-size:13px;font-weight:700;margin-bottom:3px}
+.al-text{font-size:12px;color:var(--muted);line-height:1.5}
+#toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-12px);background:var(--s3);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:600;z-index:600;opacity:0;pointer-events:none;transition:all .22s;white-space:nowrap;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .22s}
+.mbg.on{opacity:1;pointer-events:all}
+.msh{background:var(--sf);width:100%;border-radius:20px 20px 0 0;padding:20px;max-height:88svh;overflow-y:auto;transform:translateY(100%);transition:transform .25s;border:1px solid var(--border);border-bottom:none}
+.mbg.on .msh{transform:translateY(0)}
+.mhd{width:38px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px}
+.mtitle{font-size:17px;font-weight:800;margin-bottom:16px}
+.kgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px}
+.kcard{background:var(--sf);border:1px solid var(--border);border-radius:14px;padding:14px;position:relative}
+.kid{font-size:18px;font-weight:900;color:var(--orange)}
+.kmeta{font-size:11px;color:var(--muted);margin:2px 0 10px}
+.acard{background:var(--sf);border:1px solid var(--border);border-radius:14px;padding:14px;margin:0 14px 10px}
+.ahdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.aname{font-size:15px;font-weight:800}
+.atid{font-size:12px;color:var(--purple);font-weight:700;margin-top:2px}
+.txnrow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}
+.txnrow:last-child{border:none}
+.cprev{background:var(--s2);border-radius:12px;padding:14px;text-align:center;margin:10px 0;border:1px solid var(--border)}
+.cbig{font-size:28px;font-weight:900;color:var(--green);line-height:1}
+.clabel{font-size:11px;color:var(--muted);margin-top:4px}
+.qagrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px}
+.qa{background:var(--sf);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:background .15s}
+.qa:active{background:var(--s2)}
+.qaico{font-size:26px;margin-bottom:6px}
+.qalbl{font-size:12px;font-weight:700;color:var(--muted)}
+.chwrap{position:relative;height:190px;padding:0 2px}
+#clk-t{font-size:28px;font-weight:900;color:var(--green);letter-spacing:-1px;font-variant-numeric:tabular-nums;line-height:1}
+#clk-d{font-size:11px;color:var(--muted);margin-top:2px}
+.shdr{display:flex;justify-content:space-between;align-items:center;padding:14px 14px 6px}
+.stitle{font-size:15px;font-weight:800}
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.emico{font-size:44px;margin-bottom:12px}
+#ibar{position:fixed;top:0;left:0;right:0;background:var(--gd);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;z-index:500;transform:translateY(-100%);transition:transform .3s;gap:10px;border-bottom:2px solid var(--green)}
+#ibar.on{transform:translateY(0)}
+.div{height:1px;background:var(--border);margin:12px 0}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+.gap8{display:flex;gap:8px;flex-wrap:wrap}
+.bold{font-weight:700}
+.muted{color:var(--muted)}
+.green{color:var(--green)}
+.orange{color:var(--orange)}
+.red{color:var(--red)}
+.yellow{color:var(--yellow)}
+.purple{color:var(--purple)}
+.small{font-size:12px}
+.rev-hero{font-size:34px;font-weight:900;letter-spacing:-1px;line-height:1}
+.gcard-solar{background:linear-gradient(135deg,#052e16,#065f46);border-color:#166534}
+.gcard-keke{background:linear-gradient(135deg,#431407,#7c2d12);border-color:#9a3412}
+.gcard-pos{background:linear-gradient(135deg,#1e1b4b,#3730a3);border-color:#4338ca}
+@media(min-width:600px){.kgrid{grid-template-columns:repeat(4,1fr)}.stats.s4{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:768px){.scr{max-width:720px;margin:0 auto}.bnav{max-width:720px;left:50%;transform:translateX(-50%)}}
+</style>
+</head>
+<body>
+<div id="ibar">
+  <span style="font-size:13px;font-weight:700">📲 Install SisiPay on your phone</span>
+  <div style="display:flex;gap:8px;flex-shrink:0">
+    <button onclick="doInstall()" style="background:#fff;color:var(--gd);border:none;padding:6px 14px;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px">Install</button>
+    <button onclick="hideInstall()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1">×</button>
+  </div>
+</div>
+<div id="toast"></div>
+<div class="scr on" id="s-dash">
+  <div class="ph">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div><div class="ph-title" style="color:var(--green)">SisiPay</div><div class="ph-sub">Jos Business Suite</div></div>
+      <div style="text-align:right"><div id="clk-t">00:00:00</div><div id="clk-d">Jos, Nigeria</div></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 14px">
+    <div class="card gcard-solar" style="margin:0;padding:12px"><div class="clbl" style="color:#4ade80">☀️ Solar</div><div id="d-solar" style="font-size:15px;font-weight:800;color:#4ade80">₦0</div><div class="small muted">This week</div></div>
+    <div class="card gcard-keke" style="margin:0;padding:12px"><div class="clbl" style="color:var(--orange)">🛺 Keke</div><div id="d-keke" style="font-size:15px;font-weight:800;color:var(--orange)">₦0</div><div class="small muted">This week</div></div>
+    <div class="card gcard-pos" style="margin:0;padding:12px"><div class="clbl" style="color:var(--purple)">💳 POS</div><div id="d-pos" style="font-size:15px;font-weight:800;color:var(--purple)">₦0</div><div class="small muted">This week</div></div>
+  </div>
+  <div class="card" style="text-align:center;padding:16px"><div class="clbl">Total Weekly Revenue</div><div class="rev-hero green" id="d-total">₦0</div></div>
+  <div id="d-overdue"></div>
+  <div class="card"><div class="clbl">7-Day Revenue Breakdown</div><div class="chwrap"><canvas id="rev-chart"></canvas></div></div>
+  <div class="card"><div class="clbl">Fleet Battery Status</div><div id="d-fleet"></div></div>
+  <div class="shdr"><div class="stitle">Quick Actions</div></div>
+  <div class="qagrid">
+    <div class="qa" onclick="go('solar')"><div class="qaico">☀️</div><div class="qalbl">Solar Customers</div></div>
+    <div class="qa" onclick="go('keke')"><div class="qaico">🛺</div><div class="qalbl">Keke Fleet</div></div>
+    <div class="qa" onclick="go('pos')"><div class="qaico">💳</div><div class="qalbl">POS Agents</div></div>
+    <div class="qa" onclick="doExport()"><div class="qaico">📊</div><div class="qalbl">Export Report</div></div>
+  </div>
+  <div style="height:16px"></div>
+</div>
+<div class="scr" id="s-solar">
+  <div class="ph"><div class="ph-title">⚡ PAYGO Solar</div><div class="ph-sub">Customer Enrollment &amp; Collections</div></div>
+  <div class="stats s4" id="sol-stats"></div>
+  <div class="card">
+    <div class="clbl">New Customer Enrollment</div>
+    <div class="fg"><label>Full Name</label><input id="sn" type="text" placeholder="e.g. Musa Ibrahim" autocomplete="name"></div>
+    <div class="r2">
+      <div class="fg"><label>Phone</label><input id="sp" type="tel" placeholder="080..." autocomplete="tel"></div>
+      <div class="fg"><label>System Package</label><select id="spkg" onchange="pkgChange()"><option value="">Choose...</option><option value="Basic 80W">Basic 80W</option><option value="Standard 150W">Standard 150W</option><option value="Premium 300W">Premium 300W</option></select></div>
+    </div>
+    <div class="fg"><label>Address</label><input id="sa" type="text" placeholder="Street, Area, Jos"></div>
+    <div class="r2">
+      <div class="fg"><label>Deposit (₦)</label><div class="pfx-w"><span class="pfx">₦</span><input id="sdep" type="text" readonly></div></div>
+      <div class="fg"><label>Weekly Payment (₦)</label><div class="pfx-w"><span class="pfx">₦</span><input id="swk" type="text" readonly></div></div>
+    </div>
+    <button class="btn btn-pr btn-w" onclick="enrollCustomer()">+ Enroll Customer</button>
+  </div>
+  <div class="fp mt8">
+    <div class="fg" style="margin-bottom:8px"><input id="ssearch" type="search" placeholder="🔍  Search by name or phone..." oninput="renderSolarList()"></div>
+    <div class="gap8" id="sfilter-btns">
+      <button class="btn btn-sm btn-pr" onclick="sf='all';setSF(this)">All</button>
+      <button class="btn btn-sm btn-gh" onclick="sf='active';setSF(this)">Active</button>
+      <button class="btn btn-sm btn-gh" onclick="sf='overdue';setSF(this)">Overdue</button>
+      <button class="btn btn-sm btn-gh" onclick="sf='locked';setSF(this)">Locked</button>
+    </div>
+  </div>
+  <div class="card" style="padding:6px"><div id="sol-list"></div></div>
+</div>
+<div class="scr" id="s-keke">
+  <div class="ph">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><div class="ph-title">🛺 E-Keke Fleet</div><div class="ph-sub">Daily Operations</div></div>
+      <div style="text-align:right"><div class="small muted">Today's Revenue</div><div id="kk-rev" style="font-size:22px;font-weight:900;color:var(--orange)">₦0</div></div>
+    </div>
+  </div>
+  <div class="stats s4" id="kk-stats"></div>
+  <div class="shdr"><div class="stitle">Fleet</div><button class="btn btn-sm btn-gh" onclick="addKeke()">+ Add Vehicle</button></div>
+  <div class="kgrid" id="kk-grid"></div>
+  <div style="height:16px"></div>
+</div>
+<div class="scr" id="s-pos">
+  <div class="ph"><div class="ph-title">💳 Sisi Pay POS</div><div class="ph-sub">Agent Management &amp; Collections</div></div>
+  <div class="al al-b"><div class="al-ico">📋</div><div class="al-body"><div class="al-title">CBN Regulatory Notice — Nov 2025</div><div class="al-text">All POS terminals must be issued through a CBN-licensed acquiring bank (Jaiz, Sterling, Providus, etc.). Commission rate: <strong style="color:var(--yellow)">0.75%</strong> per transaction. Ensure terminal compliance before deploying agents.</div></div></div>
+  <div class="stats s4" id="pos-stats"></div>
+  <div class="card">
+    <div class="clbl">Register New Agent</div>
+    <div class="fg"><label>Agent Full Name</label><input id="pn" type="text" placeholder="e.g. Chioma Okafor" autocomplete="name"></div>
+    <div class="r2">
+      <div class="fg"><label>Phone Number</label><input id="pp" type="tel" placeholder="080..." autocomplete="tel"></div>
+      <div class="fg"><label>Terminal ID (Auto)</label><input id="ptid" type="text" readonly></div>
+    </div>
+    <button class="btn btn-pu btn-w" onclick="registerAgent()">+ Register Agent</button>
+  </div>
+  <div class="shdr"><div class="stitle">Active Agents</div></div>
+  <div id="pos-agents"></div>
+  <div style="height:16px"></div>
+</div>
+<nav class="bnav">
+  <button class="nb on" id="nb-dash" onclick="go('dash')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Overview</button>
+  <button class="nb" id="nb-solar" onclick="go('solar')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>Solar</button>
+  <button class="nb" id="nb-keke" onclick="go('keke')"><svg viewBox="0 0 24 24"><ellipse cx="7" cy="17" rx="2" ry="2"/><ellipse cx="17" cy="17" rx="2" ry="2"/><path d="M5 17H3v-5l3-5h9l3 5h1a1 1 0 010 2h-1v3M9 17h6"/><path d="M6 12h2"/></svg>E-Keke</button>
+  <button class="nb" id="nb-pos" onclick="go('pos')"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h.01M10 15h4"/></svg>POS</button>
+</nav>
+<div class="mbg" id="m-cin"><div class="msh"><div class="mhd"></div><div class="mtitle" id="m-cin-title">Check In Operator</div><div class="fg"><label>Operator Name</label><input id="ci-name" type="text" placeholder="Full name" autocomplete="name"></div><div class="r2"><div class="fg"><label>Phone Number</label><input id="ci-ph" type="tel" placeholder="080..."></div><div class="fg"><label>Battery Level (%)</label><input id="ci-batt" type="number" min="0" max="100" placeholder="e.g. 85"></div></div><div style="display:flex;gap:10px;margin-top:4px"><button class="btn btn-gh btn-w" onclick="closeM('m-cin')">Cancel</button><button class="btn btn-pr btn-w" onclick="doCheckin()">✓ Check In</button></div></div></div>
+<div class="mbg" id="m-cout"><div class="msh"><div class="mhd"></div><div class="mtitle" id="m-cout-title">Check Out &amp; Collect</div><div class="al al-w" style="margin:0 0 14px"><div class="al-ico">💰</div><div class="al-body"><div class="al-title">Daily Hire Fee: ₦3,000</div><div class="al-text">Collect the daily hire fee from the operator before releasing the vehicle.</div></div></div><div class="r2"><div class="fg"><label>Amount Collected (₦)</label><div class="pfx-w"><span class="pfx">₦</span><input id="co-amt" type="number" placeholder="3000"></div></div><div class="fg"><label>Battery After Trip (%)</label><input id="co-batt" type="number" min="0" max="100" placeholder="e.g. 45"></div></div><div style="display:flex;gap:10px;margin-top:4px"><button class="btn btn-gh btn-w" onclick="closeM('m-cout')">Cancel</button><button class="btn btn-gr btn-w" onclick="doCheckout()">✓ Check Out + Collect</button></div></div></div>
+<div class="mbg" id="m-pay"><div class="msh"><div class="mhd"></div><div class="mtitle">Record Solar Payment</div><div id="pay-cinfo" style="background:var(--s2);border-radius:10px;padding:12px;margin-bottom:14px;font-size:13px;line-height:1.6"></div><div class="r2"><div class="fg"><label>Amount Paid (₦)</label><div class="pfx-w"><span class="pfx">₦</span><input id="pay-amt" type="number" placeholder="Amount"></div></div><div class="fg"><label>Payment Date</label><input id="pay-dt" type="date"></div></div><div style="display:flex;gap:10px;margin-top:4px"><button class="btn btn-gh btn-w" onclick="closeM('m-pay')">Cancel</button><button class="btn btn-gr btn-w" onclick="doPay()">✓ Record Payment</button></div></div></div>
+<div class="mbg" id="m-txn"><div class="msh"><div class="mhd"></div><div class="mtitle" id="m-txn-title">Record Transaction</div><div class="fg"><label>Transaction Amount (₦)</label><div class="pfx-w"><span class="pfx">₦</span><input id="txn-amt" type="number" placeholder="0" oninput="calcComm()"></div></div><div class="cprev"><div class="cbig" id="comm-disp">₦0.00</div><div class="clabel">Your Commission @ 0.75%</div></div><div class="fg"><label>Transaction Type</label><select id="txn-type"><option>Transfer</option><option>Cash Withdrawal</option><option>Bill Payment</option><option>Airtime / Data</option><option>Cash Deposit</option><option>USSD Transaction</option></select></div><div style="display:flex;gap:10px;margin-top:4px"><button class="btn btn-gh btn-w" onclick="closeM('m-txn')">Cancel</button><button class="btn btn-pu btn-w" onclick="doTxn()">✓ Record</button></div></div></div>
+<div class="mbg" id="m-batt"><div class="msh"><div class="mhd"></div><div class="mtitle" id="m-batt-title">Update Battery Level</div><div class="fg"><label>Current Battery Level (%)</label><input id="batt-val" type="number" min="0" max="100" placeholder="0 – 100"></div><div style="display:flex;gap:10px;margin-top:4px"><button class="btn btn-gh btn-w" onclick="closeM('m-batt')">Cancel</button><button class="btn btn-pr btn-w" onclick="doBattUpdate()">✓ Update</button></div></div></div>
+<script>
+'use strict';
+const KEY='sisipay_v3';
+const PKGS={'Basic 80W':{deposit:35000,weekly:2500},'Standard 150W':{deposit:65000,weekly:4500},'Premium 300W':{deposit:120000,weekly:8000}};
+const COMM=0.0075;
+const DAILY_FEE=3000;
+function mkRevenue(){const arr=[];const now=new Date();for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);const iso=d.toISOString().slice(0,10);const isToday=i===0;arr.push({date:iso,solar:isToday?0:rnd(6000,18000),keke:isToday?0:rnd(9000,15000),pos:isToday?0:rnd(500,3500)});}return arr;}
+function rnd(lo,hi){return lo+Math.floor(Math.random()*(hi-lo));}
+function defaultState(){return{customers:[{id:'c001',name:'Musa Ibrahim',phone:'08012345678',address:'Zaria Rd, Jos',pkg:'Standard 150W',deposit:65000,weekly:4500,enrollDate:'2026-04-15',status:'active',lastPay:today(),balance:0},{id:'c002',name:'Fatima Usman',phone:'08098765432',address:'Angwan Rogo, Jos',pkg:'Basic 80W',deposit:35000,weekly:2500,enrollDate:'2026-03-01',status:'overdue',lastPay:'2026-04-30',balance:7500},{id:'c003',name:'Daniel Pam',phone:'07065432187',address:'Rayfield, Jos',pkg:'Premium 300W',deposit:120000,weekly:8000,enrollDate:'2026-05-01',status:'locked',lastPay:'2026-05-10',balance:16000},{id:'c004',name:'Grace Jatau',phone:'08132567890',address:'Bukuru, Jos South',pkg:'Basic 80W',deposit:35000,weekly:2500,enrollDate:'2026-05-15',status:'active',lastPay:today(),balance:0}],kekes:[{id:'K-001',batt:85,op:null,ph:null,out:false,todayRev:0},{id:'K-002',batt:62,op:'Yakubu Danladi',ph:'08055512345',out:true,todayRev:0},{id:'K-003',batt:28,op:null,ph:null,out:false,todayRev:0},{id:'K-004',batt:91,op:'Sule Mango',ph:'08033219876',out:true,todayRev:0}],agents:[{id:'a001',name:'Chioma Okafor',phone:'08076543210',tid:'SPS-001',txns:[],comm:0}],revenue:mkRevenue(),nextKeke:5,nextAgent:2};}
+let S;try{S=JSON.parse(localStorage.getItem(KEY))||defaultState();}catch{S=defaultState();}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch{}}
+function fmt(n){return'₦'+Math.floor(Math.abs(n)).toLocaleString('en-NG');}
+function fmtD(d){return d?new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'—';}
+function today(){return new Date().toISOString().slice(0,10);}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function bc(p){return p>=60?'bhi':p>=30?'bmd':'blo';}
+let _tt;
+function toast(msg,ms=3000){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('on'),ms);}
+function openM(id){document.getElementById(id).classList.add('on');}
+function closeM(id){document.getElementById(id).classList.remove('on');}
+function qs(sel,ctx=document){return ctx.querySelector(sel);}
+function addRev(stream,amt){const t=today();let e=S.revenue.find(r=>r.date===t);if(!e){e={date:t,solar:0,keke:0,pos:0};S.revenue.push(e);if(S.revenue.length>60)S.revenue.shift();}e[stream]=(e[stream]||0)+amt;}
+function checkOverdue(){const now=new Date();S.customers.forEach(c=>{if(c.status==='active'&&c.lastPay){const last=new Date(c.lastPay);const diff=(now-last)/(1000*60*60*24);if(diff>9){c.status='overdue';c.balance=Math.ceil(diff/7)*c.weekly;}}});}
+checkOverdue();
+let cur='dash';
+function go(name){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));document.getElementById('s-'+name).classList.add('on');document.getElementById('nb-'+name).classList.add('on');cur=name;if(name==='dash')renderDash();if(name==='solar')renderSolar();if(name==='keke')renderKeke();if(name==='pos')renderPOS();window.scrollTo(0,0);}
+function tick(){const now=new Date();const jos=new Date(now.toLocaleString('en-US',{timeZone:'Africa/Lagos'}));document.getElementById('clk-t').textContent=String(jos.getHours()).padStart(2,'0')+':'+String(jos.getMinutes()).padStart(2,'0')+':'+String(jos.getSeconds()).padStart(2,'0');document.getElementById('clk-d').textContent=jos.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long',year:'numeric'});}
+setInterval(tick,1000);tick();
+let chartInst=null;
+function wkSum(s){return S.revenue.reduce((a,r)=>a+(r[s]||0),0);}
+function renderDash(){const solar=wkSum('solar'),keke=wkSum('keke'),pos=wkSum('pos');document.getElementById('d-solar').textContent=fmt(solar);document.getElementById('d-keke').textContent=fmt(keke);document.getElementById('d-pos').textContent=fmt(pos);document.getElementById('d-total').textContent=fmt(solar+keke+pos);const od=S.customers.filter(c=>c.status==='overdue'||c.status==='locked');const odEl=document.getElementById('d-overdue');if(od.length){odEl.innerHTML=`<div class="al al-r"><div class="al-ico">🚨</div><div class="al-body"><div class="al-title">${od.length} customer${od.length>1?'s':''} overdue / locked</div><div class="al-text">${od.map(c=>`${c.name} — ${fmt(c.balance)} owed`).join('<br>')}</div></div><button class="btn btn-sm btn-re" onclick="go('solar')" style="flex-shrink:0;margin-left:8px">View →</button></div>`;}else{odEl.innerHTML=`<div class="al al-g"><div class="al-ico">✅</div><div class="al-body"><div class="al-title">All customers current</div><div class="al-text">No overdue payments — great work!</div></div></div>`;}
+document.getElementById('d-fleet').innerHTML=S.kekes.map(k=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)"><span style="font-weight:800;color:var(--orange);min-width:52px">${k.id}</span><div style="flex:1"><div class="bw"><div class="bt"><div class="bf ${bc(k.batt)}" style="width:${k.batt}%"></div></div><span style="font-size:11px;min-width:32px;text-align:right">${k.batt}%</span></div></div><span class="badge ${k.out?'bin':'bav'}" style="min-width:68px;text-align:center">${k.out?'🔴 Out':'🟢 Available'}</span></div>`).join('')+'<div style="height:4px"></div>';
+const last7=S.revenue.slice(-7);const labels=last7.map(r=>new Date(r.date).toLocaleDateString('en-GB',{weekday:'short'}));if(chartInst){chartInst.destroy();chartInst=null;}const ctx=document.getElementById('rev-chart').getContext('2d');chartInst=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Solar',data:last7.map(r=>r.solar),backgroundColor:'#22c55e66',borderColor:'#22c55e',borderWidth:2,borderRadius:4},{label:'Keke',data:last7.map(r=>r.keke),backgroundColor:'#fb923c66',borderColor:'#fb923c',borderWidth:2,borderRadius:4},{label:'POS',data:last7.map(r=>r.pos),backgroundColor:'#c084fc66',borderColor:'#c084fc',borderWidth:2,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8096b5',font:{size:11},boxWidth:10,boxHeight:10}}},scales:{x:{stacked:true,grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8096b5',font:{size:11}}},y:{stacked:true,grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8096b5',font:{size:11},callback:v=>'₦'+v.toLocaleString()}}},animation:{duration:500}}});}
+let sf='all';
+function pkgChange(){const pkg=document.getElementById('spkg').value;const p=PKGS[pkg];document.getElementById('sdep').value=p?p.deposit.toLocaleString('en-NG'):'';document.getElementById('swk').value=p?p.weekly.toLocaleString('en-NG'):'';}
+function setSF(btn){document.querySelectorAll('#sfilter-btns .btn').forEach(b=>{b.className='btn btn-sm btn-gh';});btn.className='btn btn-sm btn-pr';renderSolarList();}
+function renderSolar(){const act=S.customers.filter(c=>c.status==='active').length;const ovd=S.customers.filter(c=>c.status==='overdue').length;const lkd=S.customers.filter(c=>c.status==='locked').length;const tgt=S.customers.filter(c=>c.status==='active').reduce((a,c)=>a+c.weekly,0);document.getElementById('sol-stats').innerHTML=`<div class="sv"><div class="sv-v green">${act}</div><div class="sv-l">✅ Active</div></div><div class="sv"><div class="sv-v yellow">${ovd}</div><div class="sv-l">⚠️ Overdue</div></div><div class="sv"><div class="sv-v red">${lkd}</div><div class="sv-l">🔒 Locked</div></div><div class="sv"><div class="sv-v green" style="font-size:13px">${fmt(tgt)}</div><div class="sv-l">📅 Weekly Target</div></div>`;renderSolarList();}
+function renderSolarList(){const q=(document.getElementById('ssearch')?.value||'').toLowerCase();let list=[...S.customers];if(sf!=='all')list=list.filter(c=>c.status===sf);if(q)list=list.filter(c=>c.name.toLowerCase().includes(q)||c.phone.includes(q));const el=document.getElementById('sol-list');if(!list.length){el.innerHTML='<div class="empty"><div class="emico">🔍</div>No customers match</div>';return;}el.innerHTML=`<div class="tw"><table><thead><tr><th>Customer</th><th>Package</th><th>Status</th><th>Balance</th><th style="min-width:120px">Actions</th></tr></thead><tbody>${list.map(c=>`<tr><td><div class="bold" style="font-size:13px">${c.name}</div><div class="small muted">${c.phone}</div><div class="small muted">${fmtD(c.lastPay)}</div></td><td class="small">${c.pkg}</td><td><span class="badge b${c.status[0]}">${c.status}</span></td><td style="font-size:13px;${c.balance>0?'color:var(--red)':'color:var(--green)'}">${c.balance>0?fmt(c.balance):'✓ Clear'}</td><td><div style="display:flex;gap:5px;flex-wrap:wrap"><button class="btn btn-sm btn-gr" onclick="openPay('${c.id}')">✓ Pay</button>${c.status==='active'?`<button class="btn btn-sm btn-re" onclick="lockC('${c.id}')">🔒</button>`:''}${c.status==='locked'?`<button class="btn btn-sm btn-ye" onclick="unlockC('${c.id}')">🔓</button>`:''}</div></td></tr>`).join('')}</tbody></table></div>`;}
+function enrollCustomer(){const name=qs('#sn').value.trim();const ph=qs('#sp').value.trim();const pkg=qs('#spkg').value;const addr=qs('#sa').value.trim();if(!name||!ph||!pkg){toast('⚠️ Name, phone & package required');return;}const p=PKGS[pkg];S.customers.unshift({id:uid(),name,phone:ph,address:addr,pkg,deposit:p.deposit,weekly:p.weekly,enrollDate:today(),status:'active',lastPay:today(),balance:0});addRev('solar',p.deposit);save();toast(`✅ ${name} enrolled — deposit ${fmt(p.deposit)} received`);['sn','sp','sa'].forEach(id=>qs('#'+id).value='');qs('#spkg').value='';qs('#sdep').value='';qs('#swk').value='';renderSolar();if(cur==='dash')renderDash();}
+let payId=null;
+function openPay(id){payId=id;const c=S.customers.find(x=>x.id===id);qs('#pay-cinfo').innerHTML=`<strong>${c.name}</strong> — ${c.pkg}<br><span class="muted">Weekly: ${fmt(c.weekly)}</span>`+(c.balance>0?`<br><span class="red">Owed: ${fmt(c.balance)}</span>`:'<br><span class="green">Account clear</span>');qs('#pay-amt').value=c.weekly;qs('#pay-dt').value=today();openM('m-pay');}
+function doPay(){const amt=parseFloat(qs('#pay-amt').value)||0;const dt=qs('#pay-dt').value;if(!amt||!dt){toast('⚠️ Enter amount and date');return;}const c=S.customers.find(x=>x.id===payId);c.balance=Math.max(0,c.balance-amt);c.lastPay=dt;if(c.status!=='active')c.status='active';addRev('solar',amt);save();closeM('m-pay');toast(`✅ ${fmt(amt)} recorded for ${c.name}`);renderSolar();if(cur==='dash')renderDash();}
+function lockC(id){const c=S.customers.find(x=>x.id===id);const diff=(new Date()-new Date(c.lastPay))/(1000*60*60*24*7);c.status='locked';c.balance=Math.ceil(diff)*c.weekly;save();toast(`🔒 ${c.name} locked — ${fmt(c.balance)} owed`);renderSolar();}
+function unlockC(id){S.customers.find(x=>x.id===id).status='overdue';save();toast('🔓 Moved to overdue');renderSolar();}
+let kkId=null;
+function renderKeke(){const total=S.kekes.reduce((a,k)=>a+(k.todayRev||0),0);document.getElementById('kk-rev').textContent=fmt(total);const out=S.kekes.filter(k=>k.out).length;const avail=S.kekes.filter(k=>!k.out).length;const avgB=S.kekes.length?Math.round(S.kekes.reduce((a,k)=>a+k.batt,0)/S.kekes.length):0;document.getElementById('kk-stats').innerHTML=`<div class="sv"><div class="sv-v purple">${out}</div><div class="sv-l">🔴 Out</div></div><div class="sv"><div class="sv-v" style="color:var(--blue)">${avail}</div><div class="sv-l">🟢 Available</div></div><div class="sv"><div class="sv-v green">${avgB}%</div><div class="sv-l">⚡ Avg Battery</div></div><div class="sv"><div class="sv-v orange" style="font-size:14px">${fmt(total)}</div><div class="sv-l">💰 Revenue</div></div>`;document.getElementById('kk-grid').innerHTML=S.kekes.map(k=>`<div class="kcard"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px"><div class="kid">${k.id}</div><button class="btn btn-sm btn-gh" onclick="openBatt('${k.id}')" style="padding:4px 8px;font-size:11px">⚡</button></div><div class="kmeta">${k.out?(k.op||'Out'):'Available'}</div><div class="bw" style="margin-bottom:10px"><div class="bt"><div class="bf ${bc(k.batt)}" style="width:${k.batt}%"></div></div><span style="font-size:11px;min-width:30px;text-align:right">${k.batt}%</span></div>${k.out?`<div class="small muted" style="margin-bottom:6px">📞 ${k.ph||'—'}</div><div class="small orange bold" style="margin-bottom:8px">${fmt(k.todayRev||0)} today</div><button class="btn btn-gr btn-sm btn-w" onclick="openCheckout('${k.id}')">✓ Check Out + Collect</button>`:`<button class="btn btn-pr btn-sm btn-w" onclick="openCheckin('${k.id}')">+ Check In Operator</button>`}</div>`).join('');}
+function addKeke(){const n=S.nextKeke++;S.kekes.push({id:'K-'+String(n).padStart(3,'0'),batt:100,op:null,ph:null,out:false,todayRev:0});save();toast('🛺 Vehicle K-'+String(n).padStart(3,'0')+' added');renderKeke();}
+function openCheckin(id){kkId=id;qs('#m-cin-title').textContent='Check In — '+id;qs('#ci-name').value='';qs('#ci-ph').value='';qs('#ci-batt').value=S.kekes.find(k=>k.id===id)?.batt||100;openM('m-cin');}
+function doCheckin(){const name=qs('#ci-name').value.trim();const ph=qs('#ci-ph').value.trim();const batt=Math.min(100,Math.max(0,parseInt(qs('#ci-batt').value)||100));if(!name){toast('⚠️ Enter operator name');return;}const k=S.kekes.find(x=>x.id===kkId);k.op=name;k.ph=ph;k.batt=batt;k.out=true;save();closeM('m-cin');toast(`✅ ${name} checked in on ${kkId}`);renderKeke();}
+function openCheckout(id){kkId=id;qs('#m-cout-title').textContent='Check Out — '+id;qs('#co-amt').value=DAILY_FEE;qs('#co-batt').value='';openM('m-cout');}
+function doCheckout(){const amt=parseFloat(qs('#co-amt').value)||0;const batt=Math.min(100,Math.max(0,parseInt(qs('#co-batt').value)||20));const k=S.kekes.find(x=>x.id===kkId);k.todayRev=(k.todayRev||0)+amt;k.batt=batt;k.op=null;k.ph=null;k.out=false;addRev('keke',amt);save();closeM('m-cout');toast(`✅ ${kkId} cleared — ${fmt(amt)} collected`);renderKeke();if(cur==='dash')renderDash();}
+function openBatt(id){kkId=id;qs('#m-batt-title').textContent='Battery — '+id;qs('#batt-val').value=S.kekes.find(k=>k.id===id)?.batt||0;openM('m-batt');}
+function doBattUpdate(){const v=Math.min(100,Math.max(0,parseInt(qs('#batt-val').value)||0));S.kekes.find(k=>k.id===kkId).batt=v;save();closeM('m-batt');toast(`⚡ ${kkId} battery updated to ${v}%`);renderKeke();if(cur==='dash')renderDash();}
+let agId=null;
+function renderPOS(){qs('#ptid').value='SPS-'+String(S.nextAgent).padStart(3,'0');const totComm=S.agents.reduce((a,ag)=>a+(ag.comm||0),0);const totTxns=S.agents.reduce((a,ag)=>a+(ag.txns?.length||0),0);const totVol=S.agents.reduce((a,ag)=>a+(ag.txns?.reduce((x,t)=>x+t.amt,0)||0),0);document.getElementById('pos-stats').innerHTML=`<div class="sv"><div class="sv-v">${S.agents.length}</div><div class="sv-l">👤 Agents</div></div><div class="sv"><div class="sv-v">${totTxns}</div><div class="sv-l">📋 Transactions</div></div><div class="sv"><div class="sv-v green" style="font-size:13px">${fmt(totComm)}</div><div class="sv-l">💰 Commission</div></div><div class="sv"><div class="sv-v" style="font-size:13px">${fmt(totVol)}</div><div class="sv-l">📊 Volume</div></div>`;const el=document.getElementById('pos-agents');if(!S.agents.length){el.innerHTML='<div class="empty"><div class="emico">👤</div>No agents registered yet</div>';return;}el.innerHTML=S.agents.map(ag=>{const vol=ag.txns.reduce((a,t)=>a+t.amt,0);const recent=[...ag.txns].reverse().slice(0,5);return`<div class="acard"><div class="ahdr"><div><div class="aname">${ag.name}</div><div class="atid">${ag.tid}</div><div class="small muted">📞 ${ag.phone}</div></div><div style="text-align:right"><div class="small muted">Commission</div><div style="font-size:22px;font-weight:900;color:var(--green)">${fmt(ag.comm||0)}</div><div class="small muted">${ag.txns.length} transactions</div></div></div><div style="background:var(--s2);border-radius:10px;padding:10px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:6px"><span class="muted">Total Volume</span><span class="bold">${fmt(vol)}</span></div>${recent.length?recent.map(t=>`<div class="txnrow"><span class="muted">${t.type}</span><span>${fmt(t.amt)}</span><span class="green">+${fmt(t.comm)}</span><span class="muted" style="font-size:10px">${fmtD(t.date)}</span></div>`).join(''):'<div class="small muted" style="text-align:center;padding:4px">No transactions yet</div>'}</div><button class="btn btn-pu btn-sm btn-w" onclick="openTxn('${ag.id}')">+ Record Transaction</button></div>`;}).join('');}
+function registerAgent(){const name=qs('#pn').value.trim();const ph=qs('#pp').value.trim();if(!name||!ph){toast('⚠️ Enter agent name and phone');return;}const tid='SPS-'+String(S.nextAgent).padStart(3,'0');S.agents.push({id:uid(),name,phone:ph,tid,txns:[],comm:0});S.nextAgent++;save();toast(`✅ ${name} registered as ${tid}`);qs('#pn').value='';qs('#pp').value='';renderPOS();}
+function openTxn(id){agId=id;const ag=S.agents.find(x=>x.id===id);qs('#m-txn-title').textContent=`Transaction — ${ag.tid} (${ag.name})`;qs('#txn-amt').value='';qs('#comm-disp').textContent='₦0.00';openM('m-txn');}
+function calcComm(){const amt=parseFloat(qs('#txn-amt').value)||0;qs('#comm-disp').textContent='₦'+(amt*COMM).toFixed(2);}
+function doTxn(){const amt=parseFloat(qs('#txn-amt').value)||0;const type=qs('#txn-type').value;if(!amt){toast('⚠️ Enter transaction amount');return;}const comm=amt*COMM;const ag=S.agents.find(x=>x.id===agId);ag.txns.push({amt,comm,type,date:today()});ag.comm=(ag.comm||0)+comm;addRev('pos',comm);save();closeM('m-txn');toast(`✅ ${fmt(amt)} recorded — Commission: ₦${comm.toFixed(2)}`);renderPOS();if(cur==='dash')renderDash();}
+function doExport(){const now=new Date().toLocaleString('en-GB',{timeZone:'Africa/Lagos'});const lines=['╔══════════════════════════════════════════╗','║       SISIPAY BUSINESS SUITE REPORT      ║','╚══════════════════════════════════════════╝',`Generated: ${now} (Jos, Nigeria)`,'','─── SOLAR CUSTOMERS ───────────────────────',...S.customers.map(c=>`${c.name.padEnd(20)} ${c.phone}  ${c.pkg.padEnd(16)} ${c.status.toUpperCase().padEnd(8)} Balance: ${fmt(c.balance)}`),`\nTotal Deposits Held: ${fmt(S.customers.reduce((a,c)=>a+c.deposit,0))}`,`Weekly Collection Target: ${fmt(S.customers.filter(c=>c.status==='active').reduce((a,c)=>a+c.weekly,0))}`,'','─── E-KEKE FLEET ──────────────────────────',...S.kekes.map(k=>`${k.id}  Battery:${k.batt}%  ${k.out?'OUT: '+k.op:'AVAILABLE'}  Today: ${fmt(k.todayRev||0)}`),`\nFleet Revenue Today: ${fmt(S.kekes.reduce((a,k)=>a+(k.todayRev||0),0))}`,'','─── POS AGENTS ────────────────────────────',...S.agents.map(ag=>`${ag.name.padEnd(20)} ${ag.tid}  ${ag.txns.length} txns  Commission: ${fmt(ag.comm||0)}`),'',' ─── 7-DAY REVENUE ─────────────────────────',...S.revenue.slice(-7).map(r=>`${r.date}  Solar: ${fmt(r.solar).padEnd(12)} Keke: ${fmt(r.keke).padEnd(12)} POS: ${fmt(r.pos)}`),``,`GRAND TOTAL THIS WEEK: ${fmt(S.revenue.slice(-7).reduce((a,r)=>a+r.solar+r.keke+r.pos,0))}`];const blob=new Blob([lines.join('\n')],{type:'text/plain'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`sisipay-report-${today()}.txt`;a.click();URL.revokeObjectURL(url);toast('📊 Report exported successfully');}
+let _deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();_deferredPrompt=e;document.getElementById('ibar').classList.add('on');});
+window.addEventListener('appinstalled',()=>{hideInstall();toast('🎉 SisiPay installed!');});
+function doInstall(){if(_deferredPrompt){_deferredPrompt.prompt();_deferredPrompt.userChoice.then(()=>{_deferredPrompt=null;hideInstall();});}else{toast('ℹ️ Open in Chrome → ⋮ → Add to Home Screen');}}
+function hideInstall(){document.getElementById('ibar').classList.remove('on');}
+if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+document.querySelectorAll('.mbg').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('on');});});
+renderDash();
+<\/script>
+</body>
+</html>

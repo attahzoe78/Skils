@@ -1,0 +1,55 @@
+<Application x:Class="HermesDesktop.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:HermesDesktop.Converters"
+             xmlns:vm="clr-namespace:HermesDesktop.ViewModels"
+             xmlns:views="clr-namespace:HermesDesktop.Views">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/ControlStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+            <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility"/>
+            <converters:NullToVisibilityConverter x:Key="NullToVisibility"/>
+            <converters:RelativeDateConverter x:Key="RelativeDate"/>
+            <converters:RoleToBrushConverter x:Key="RoleToBrush"/>
+            <converters:TabActiveToBrushConverter x:Key="TabActiveToBrush"/>
+
+            <DataTemplate DataType="{x:Type vm:ConnectionManagerViewModel}">
+                <views:ConnectionManagerView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:OverviewViewModel}">
+                <views:OverviewView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:FileEditorViewModel}">
+                <views:FileEditorView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:SessionBrowserViewModel}">
+                <views:SessionBrowserView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:WorkflowsViewModel}">
+                <views:WorkflowsView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:KanbanViewModel}">
+                <views:KanbanView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:UsageBrowserViewModel}">
+                <views:UsageBrowserView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:SkillBrowserViewModel}">
+                <views:SkillBrowserView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:CronJobsViewModel}">
+                <views:CronJobsView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:WikiBrowserViewModel}">
+                <views:WikiBrowserView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:TerminalViewModel}">
+                <views:TerminalView HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            </DataTemplate>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

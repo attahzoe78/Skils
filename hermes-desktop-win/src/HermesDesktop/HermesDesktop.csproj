@@ -1,0 +1,83 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources\Icons\hermes.ico</ApplicationIcon>
+    <Version>1.5.5</Version>
+    <AssemblyVersion>1.5.5.0</AssemblyVersion>
+    <FileVersion>1.5.5.0</FileVersion>
+    <Product>Hermes Desktop for Windows</Product>
+    <AssemblyTitle>Hermes Desktop</AssemblyTitle>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Scripts\*.py" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Terminal\**\*">
+      <LogicalName>HermesDesktop.EmbeddedAssets.Terminal.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\Markdown\**\*">
+      <LogicalName>HermesDesktop.EmbeddedAssets.Markdown.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\Wiki\**\*">
+      <LogicalName>HermesDesktop.EmbeddedAssets.Wiki.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\Fonts\**\*">
+      <LogicalName>HermesDesktop.EmbeddedAssets.Fonts.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Icons\hermes.ico" />
+    <Resource Include="Resources\Icons\hermes.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Terminal\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Assets\Markdown\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Assets\Wiki\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Assets\Fonts\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <!-- PublishSingleFile bundles Content into the exe by default; the TTFs
+           must stay on disk so WebView2 can serve them via the font virtual host. -->
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <!-- WPF implicitly discovers *.ttf as embedded <Resource>, which prevents the
+         file from being copied to disk. Drop those implicit items so the <Content>
+         entries above win. -->
+    <Resource Remove="Assets\Fonts\**\*.ttf" />
+    <Page Remove="Assets\Fonts\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\font-catalog.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.6" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3912.50" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="SSH.NET" Version="2025.1.0" />
+  </ItemGroup>
+
+</Project>

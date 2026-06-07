@@ -1,0 +1,281 @@
+<Window x:Class="HermesDesktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding WindowTitle}" Width="1200" Height="800"
+        MinWidth="900" MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource WindowBackground}">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32" ResizeBorderThickness="4"
+                      GlassFrameThickness="0" CornerRadius="0"/>
+    </WindowChrome.WindowChrome>
+
+    <Window.InputBindings>
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveFileShortcutCommand}"/>
+        <KeyBinding Key="R" Modifiers="Control" Command="{Binding RefreshCurrentSectionCommand}"/>
+        <KeyBinding Key="F" Modifiers="Control" Command="{Binding FindCurrentSectionCommand}"/>
+        <KeyBinding Key="T" Modifiers="Control+Shift" Command="{Binding NewTerminalTabCommand}"/>
+        <KeyBinding Key="N" Modifiers="Control+Shift" Command="{Binding NewChatCommand}"/>
+        <KeyBinding Key="U" Modifiers="Control+Shift" Command="{Binding CheckUpdatesCommand}"/>
+    </Window.InputBindings>
+
+    <Grid x:Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding SidebarColumnWidth, Mode=TwoWay}" MinWidth="64" MaxWidth="380"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Custom Title Bar -->
+        <Grid Grid.Row="0" Grid.ColumnSpan="3" Background="{DynamicResource WindowBackground}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="12,0,0,0"
+                        VerticalAlignment="Center">
+                <Image Source="/Resources/Icons/hermes.ico" Width="16" Height="16"
+                       RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,8,0"/>
+                <TextBlock Text="{Binding WindowTitle}" FontSize="12" FontWeight="Medium"
+                           Foreground="{DynamicResource TextTertiary}"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Top">
+                <Button x:Name="MinimizeButton" Style="{StaticResource CaptionButtonStyle}"
+                        Content="&#xE921;" Click="MinimizeButton_Click"
+                        ToolTip="Minimize"/>
+                <Button x:Name="MaximizeButton" Style="{StaticResource CaptionButtonStyle}"
+                        Content="&#xE922;" Click="MaximizeButton_Click"
+                        ToolTip="Maximize"/>
+                <Button x:Name="CloseButton" Style="{StaticResource CloseButtonStyle}"
+                        Content="&#xE8BB;" Click="CloseButton_Click"
+                        ToolTip="Close"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Sidebar -->
+        <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                BorderThickness="0,0,1,0" BorderBrush="{DynamicResource SidebarBorder}">
+            <DockPanel>
+                <!-- Top: full info when expanded, just hermes icon when collapsed -->
+                <Border DockPanel.Dock="Top" Padding="12,8" BorderThickness="0,0,0,1"
+                        BorderBrush="{DynamicResource SidebarBorder}"
+                        Visibility="{Binding ActiveConnection, Converter={StaticResource NullToVisibility}}">
+                    <Grid>
+                        <StackPanel Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisibility}}">
+                            <TextBlock Text="{Binding ActiveConnection.Label}" FontWeight="Medium" FontSize="12"
+                                       Foreground="{DynamicResource TextSecondary}"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding ActiveConnection.DisplayTarget}" FontSize="11"
+                                       Foreground="{DynamicResource TextTertiary}" Margin="0,2,0,0"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                        <Image Source="/Resources/Icons/hermes.ico" Width="22" Height="22"
+                               RenderOptions.BitmapScalingMode="HighQuality"
+                               HorizontalAlignment="Center"
+                               Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource BoolToVisibility}}">
+                            <Image.ToolTip>
+                                <ToolTip>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding ActiveConnection.Label}" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding ActiveConnection.DisplayTarget}" FontSize="11"
+                                                   Foreground="{DynamicResource TextTertiary}"/>
+                                        <TextBlock Text="{Binding ActiveConnection.RemoteHermesHomePath}" FontSize="10"
+                                                   FontFamily="Consolas" Foreground="{DynamicResource TextTertiary}"
+                                                   Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                </ToolTip>
+                            </Image.ToolTip>
+                        </Image>
+                    </Grid>
+                </Border>
+
+                <!-- Bottom: status + collapse toggle -->
+                <Border DockPanel.Dock="Bottom" Padding="6,6,6,6" BorderThickness="0,1,0,0"
+                        BorderBrush="{DynamicResource SidebarBorder}">
+                    <DockPanel LastChildFill="True">
+                        <Button DockPanel.Dock="Right" Command="{Binding ToggleSidebarCommand}"
+                                Width="32" Height="26" Padding="0" BorderThickness="0"
+                                Background="Transparent">
+                            <Button.ToolTip>
+                                <ToolTip>
+                                    <TextBlock>
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="Collapse sidebar"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSidebarCollapsed}" Value="True">
+                                                        <Setter Property="Text" Value="Expand sidebar"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </ToolTip>
+                            </Button.ToolTip>
+                            <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="11"
+                                       Foreground="{DynamicResource TextTertiary}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="&#xE76B;"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSidebarCollapsed}" Value="True">
+                                                <Setter Property="Text" Value="&#xE76C;"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Button>
+                        <TextBlock Text="{Binding StatusMessage}" FontSize="11" VerticalAlignment="Center"
+                                   Margin="6,0,0,0"
+                                   Foreground="{DynamicResource TextTertiary}"
+                                   TextTrimming="CharacterEllipsis"
+                                   Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisibility}}"/>
+                    </DockPanel>
+                </Border>
+
+                <ListBox ItemsSource="{Binding NavigationItems}"
+                         SelectedValue="{Binding SelectedSection}"
+                         SelectedValuePath="Section"
+                         BorderThickness="0" Background="Transparent" Padding="4,8"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="8,5"
+                                        ToolTip="{Binding Label}">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DataContext.IsSidebarCollapsed,
+                                                                   RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock Text="{Binding IconGlyph}" FontFamily="Segoe MDL2 Assets"
+                                           FontSize="14" Foreground="{DynamicResource TextTertiary}"
+                                           VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Margin" Value="0,0,10,0"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.IsSidebarCollapsed,
+                                                                       RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                                                    <Setter Property="Margin" Value="0"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock Text="{Binding Label}" FontSize="13"
+                                           Foreground="{DynamicResource TextSecondary}"
+                                           Visibility="{Binding DataContext.IsSidebarCollapsed,
+                                                                RelativeSource={RelativeSource AncestorType=Window},
+                                                                Converter={StaticResource InverseBoolToVisibility}}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="8,4"/>
+                            <Setter Property="Margin" Value="4,1"/>
+                            <Setter Property="Cursor" Value="Hand"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="Bd" Padding="{TemplateBinding Padding}"
+                                                Background="Transparent" CornerRadius="4">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bd" Property="Background"
+                                                        Value="{DynamicResource SidebarHover}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Bd" Property="Background"
+                                                        Value="{DynamicResource SidebarSelected}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <GridSplitter Grid.Row="1" Grid.Column="1" Width="3" HorizontalAlignment="Center"
+                      VerticalAlignment="Stretch" Background="{DynamicResource SplitterBrush}"
+                      Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisibility}}"/>
+
+        <!-- Content area -->
+        <ContentControl Grid.Row="1" Grid.Column="2" Content="{Binding CurrentContentViewModel}" Margin="0"
+                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+
+        <!-- Unsaved changes dialog overlay -->
+        <Border Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="3"
+                Background="{DynamicResource OverlayBackground}"
+                Visibility="{Binding ShowDiscardChangesDialog, Converter={StaticResource BoolToVisibility}}"
+                Panel.ZIndex="100">
+            <Border Background="{DynamicResource DialogBackground}" CornerRadius="8" Padding="24"
+                    MaxWidth="420" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Discard unsaved changes?" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,8"/>
+                    <TextBlock Text="USER.md, MEMORY.md, or SOUL.md has unsaved edits. Discard and navigate away?"
+                               FontSize="13" Foreground="{DynamicResource TextSecondary}"
+                               TextWrapping="Wrap" Margin="0,0,0,20"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Stay" Command="{Binding CancelNavigationCommand}"
+                                Padding="16,6" Margin="0,0,8,0"/>
+                        <Button Content="Discard" Command="{Binding DiscardChangesAndNavigateCommand}"
+                                Padding="16,6" Style="{StaticResource DangerButton}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <Border Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="3"
+                Background="{DynamicResource OverlayBackground}"
+                Visibility="{Binding ShowUpdateDialog, Converter={StaticResource BoolToVisibility}}"
+                Panel.ZIndex="101">
+            <Border Background="{DynamicResource DialogBackground}" CornerRadius="8" Padding="24"
+                    MaxWidth="520" VerticalAlignment="Center" HorizontalAlignment="Center"
+                    BorderBrush="{DynamicResource PanelBorder}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Update available" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,8"/>
+                    <TextBlock Foreground="{DynamicResource TextSecondary}" TextWrapping="Wrap" Margin="0,0,0,12">
+                        <Run Text="Version "/>
+                        <Run Text="{Binding AvailableUpdate.LatestVersion}"/>
+                        <Run Text=" is available for Hermes Desktop for Windows."/>
+                    </TextBlock>
+                    <TextBlock Text="{Binding AvailableUpdate.Notes}" FontSize="12"
+                               Foreground="{DynamicResource TextTertiary}" TextWrapping="Wrap"
+                               MaxHeight="180" Margin="0,0,0,16"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Dismiss" Command="{Binding DismissUpdateCommand}"
+                                Padding="16,6" Margin="0,0,8,0"/>
+                        <Button Content="Open Release" Command="{Binding OpenUpdateReleaseCommand}"
+                                Padding="16,6" Style="{StaticResource AccentButton}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</Window>
